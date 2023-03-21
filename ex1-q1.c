@@ -3,15 +3,19 @@
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
+#include <signal.h>
 
 #define GRADES_FILE "all_std.log"
 
 char* getOutputFileName(int pid);
 void getStudentNameAndGradeAvg(char* line, char** studentName, float* studentGradeAvg);
 void processFile(char* inputFileName);
+void disableZombies();
 
 int main(int argc, char* argv[]) {
     int pid;
+
+    disableZombies();
 
     for (int i = 1; i < argc; i++) {
         pid = fork();
@@ -20,6 +24,14 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
+}
+
+void disableZombies() {
+    struct sigaction act;
+    sigemptyset (&act.sa_mask);
+    act.sa_handler = SIG_IGN;
+    act.sa_flags = 0;
+    sigaction(SIGCHLD, &act, NULL);
 }
 
 char* getOutputFileName(int pid) {
