@@ -79,5 +79,30 @@
             ],
             "preLaunchTask": "C/C++: gcc-11 build active file"
         },
+        {
+            "name": "Test /w gr_1.txt & gr_2.txt & gr_3.txt",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": ["input-samples/gr_1.txt", "input-samples/gr_2.txt", "input-samples/gr_3.txt"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++: gcc-11 build active file"
+        }
     ]
 }

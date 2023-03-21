@@ -11,7 +11,15 @@ void getStudentNameAndGradeAvg(char* line, char** studentName, float* studentGra
 void processFile(char* inputFileName);
 
 int main(int argc, char* argv[]) {
-    processFile(argv[1]);
+    int pid;
+
+    for (int i = 1; i < argc; i++) {
+        pid = fork();
+        if (pid == 0) {
+            processFile(argv[i]);
+            break;
+        }
+    }
 }
 
 char* getOutputFileName(int pid) {
@@ -49,8 +57,8 @@ void processFile(char* inputFileName) {
     char* currentLine = NULL;
     char* studentName;
     float studentGradeAvg;
-    size_t studentCount = 0;
     size_t currentLineLength;
+    size_t studentCount = 0;
     int pid = getpid();
 
     if (inputFile == NULL) {
@@ -84,6 +92,6 @@ void processFile(char* inputFileName) {
         fclose(inputFile);
     }
 
-    fprintf(stderr, "process: %d file: %s number of students: %zu", pid, inputFileName, studentCount);
+    fprintf(stderr, "process: %d file: %s number of students: %zu\n", pid, inputFileName, studentCount);
 }
 
