@@ -8,8 +8,8 @@
 #define GRADES_FILE "all_std.log"
 
 char* getOutputFileName(int pid);
-void getStudentNameAndGradeAvg(char* line, char** studentName, float* studentGradeAvg);
-void processFile(char* inputFileName);
+void getStdNameAndGradeAvg(char* line, char** std_name, float* grade_avg);
+void processFile(char* in_file_name);
 void disableZombies();
 
 int main(int argc, char* argv[]) {
@@ -35,75 +35,75 @@ void disableZombies() {
 }
 
 char* getOutputFileName(int pid) {
-    char* outputFileName = (char*)malloc((int)((ceil(log10(pid))+6)*sizeof(char)));
-    if (outputFileName == NULL) {
+    char* out_file_name = (char*)malloc((int)((ceil(log10(pid))+6)*sizeof(char)));
+    if (out_file_name == NULL) {
         perror("Failed to allocate memory for output file name");
     }
     else {
-        sprintf(outputFileName, "%d.temp", pid);
+        sprintf(out_file_name, "%d.temp", pid);
     }
-    return outputFileName;
+    return out_file_name;
 }
 
-void getStudentNameAndGradeAvg(char* line, char** studentName, float* studentGradeAvg) {
-    size_t currentGrade;
-    size_t gradeCount = 0;
-    size_t gradeSum = 0;
+void getStdNameAndGradeAvg(char* line, char** std_name, float* grade_avg) {
+    size_t curr_grade;
+    size_t grade_count = 0;
+    size_t grade_sum = 0;
     char* token;
 
-    *studentName = strtok(line, " ");
+    *std_name = strtok(line, " ");
     token = strtok(NULL, " ");
     while (token != NULL) { 
-        gradeSum += atoi(token);
-        gradeCount++;
+        grade_sum += atoi(token);
+        grade_count++;
         token = strtok(NULL, " ");
     }
 
-    *studentGradeAvg = (float)gradeSum / gradeCount;
+    *grade_avg = (float)grade_sum / grade_count;
 }
 
-void processFile(char* inputFileName) {
-    FILE* inputFile = fopen(inputFileName, "r");
-    FILE* outputFile;
-    char* outputFileName;
-    char* currentLine = NULL;
-    char* studentName;
-    float studentGradeAvg;
-    size_t currentLineLength;
-    size_t studentCount = 0;
+void processFile(char* in_file_name) {
+    FILE* in_file = fopen(in_file_name, "r");
+    FILE* out_file;
+    char* out_file_name;
+    char* curr_line = NULL;
+    char std_name[11];
+    float grade_avg;
+    size_t curr_line_len;
+    size_t std_count = 0;
     int pid = getpid();
 
-    if (inputFile == NULL) {
+    if (in_file == NULL) {
         perror("Failed to open input file for reading");
     }
     else {
-        outputFileName = getOutputFileName(pid);
+        out_file_name = getOutputFileName(pid);
 
-        if (outputFileName != NULL) {
-            outputFile = fopen(outputFileName, "w");
+        if (out_file_name != NULL) {
+            out_file = fopen(out_file_name, "w");
 
-            if (outputFile == NULL) {
+            if (out_file == NULL) {
                 perror("Failed to open output file for writing");
             }
             else {
-                while(getline(&currentLine, &currentLineLength, inputFile) != -1) {
-                    getStudentNameAndGradeAvg(currentLine, &studentName, &studentGradeAvg);
-                    if (studentCount != 0) {
-                        fwrite("\n", sizeof(char), 1, outputFile);
+                while(getline(&curr_line, &curr_line_len, in_file) != -1) {
+                    getStdNameAndGradeAvg(curr_line, &std_name, &grade_avg);
+                    if (std_count != 0) {
+                        fwrite("\n", sizeof(char), 1, out_file);
                     }
-                    fprintf(outputFile, "%s %.1f", studentName, studentGradeAvg);
-                    free(currentLine);
-                    studentCount++;
+                    fprintf(out_file, "%s %.1f", std_name, grade_avg);
+                    free(curr_line);
+                    std_count++;
                 }
-                fclose(outputFile);
+                fclose(out_file);
             }
 
-            free(outputFileName);
+            free(out_file_name);
         }
 
-        fclose(inputFile);
+        fclose(in_file);
     }
 
-    fprintf(stderr, "process: %d file: %s number of students: %zu\n", pid, inputFileName, studentCount);
+    fprintf(stderr, "process: %d file: %s number of students: %zu\n", pid, in_file_name, std_count);
 }
 
